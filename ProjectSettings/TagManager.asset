@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Grudge
+  - PlayerHead
   layers:
   - Default
   - TransparentFX

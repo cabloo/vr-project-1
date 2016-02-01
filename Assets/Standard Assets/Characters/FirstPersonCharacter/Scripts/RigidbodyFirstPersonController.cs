@@ -76,11 +76,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        public Camera cam;
         public MovementSettings movementSettings = new MovementSettings();
-        public MouseLook mouseLook = new MouseLook();
         public AdvancedSettings advancedSettings = new AdvancedSettings();
-
+		public GameObject HeadTracker;
 
         private Rigidbody m_RigidBody;
         private CapsuleCollider m_Capsule;
@@ -121,7 +119,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_RigidBody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
-            mouseLook.Init (transform, cam.transform);
+			HeadTracker = GameObject.FindGameObjectsWithTag("PlayerHead")[0];
         }
 
 
@@ -141,10 +139,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             GroundCheck();
             Vector2 input = GetInput();
 
+			var look = HeadTracker.transform.rotation.eulerAngles;
+			//Debug.Log(Input.GetAxis("Horizontal"));
+
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
             {
                 // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = cam.transform.forward*input.y + cam.transform.right*input.x;
+                Vector3 desiredMove = look.forward * input.y + look.right * input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
                 desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
@@ -213,8 +214,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             
             Vector2 input = new Vector2
                 {
-                    x = CrossPlatformInputManager.GetAxis("Horizontal"),
-                    y = CrossPlatformInputManager.GetAxis("Vertical")
+                    x = Input.GetAxis("Horizontal"),
+                    y = Input.GetAxis("Vertical")
                 };
 			movementSettings.UpdateDesiredTargetSpeed(input);
             return input;
@@ -223,13 +224,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void RotateView()
         {
-            //avoids the mouse looking if the game is effectively paused
+			return;
+			//avoids the mouse looking if the game is effectively paused
             if (Mathf.Abs(Time.timeScale) < float.Epsilon) return;
 
             // get the rotation before it's changed
             float oldYRotation = transform.eulerAngles.y;
-
-            mouseLook.LookRotation (transform, cam.transform);
 
             if (m_IsGrounded || advancedSettings.airControl)
             {
