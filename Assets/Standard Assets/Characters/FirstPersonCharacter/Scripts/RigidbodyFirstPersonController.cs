@@ -119,7 +119,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_RigidBody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
-			HeadTracker = GameObject.FindGameObjectsWithTag("PlayerHead")[0];
         }
 
 
@@ -139,13 +138,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             GroundCheck();
             Vector2 input = GetInput();
 
-			var look = HeadTracker.transform.rotation.eulerAngles;
+			var look = HeadTracker.transform;
 			//Debug.Log(Input.GetAxis("Horizontal"));
 
             if ((Mathf.Abs(input.x) > float.Epsilon || Mathf.Abs(input.y) > float.Epsilon) && (advancedSettings.airControl || m_IsGrounded))
             {
                 // always move along the camera forward as it is the direction that it being aimed at
-                Vector3 desiredMove = look.forward * input.y + look.right * input.x;
+                Vector3 desiredMove = look.forward * -input.y + look.right * -input.x;
                 desiredMove = Vector3.ProjectOnPlane(desiredMove, m_GroundContactNormal).normalized;
 
                 desiredMove.x = desiredMove.x*movementSettings.CurrentTargetSpeed;
